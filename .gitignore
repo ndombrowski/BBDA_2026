@@ -12,3 +12,5 @@ random.qmd
 CLAUDE.md
 
 to_do.md
+
+**/*.quarto_ipynb
