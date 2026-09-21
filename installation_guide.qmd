@@ -1,0 +1,26 @@
+---
+title: "Installation guide"
+
+engine: knitr 
+
+execute:
+   eval: false
+---
+
+# How-to
+
+```{bash}
+# Installation
+# Note, this comes with base R 4.4.3 (and several r packages incl. tidyverse 2.0.0 but not incl. deseq nor tximport)
+mamba create \
+   -p /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/transcriptomics_bbda \
+   -c bioconda -c conda-forge \
+   python=3.10.15 \
+   trinity=2.15.2 \
+   busco=5.8.0 \
+   transdecoder=5.7.1 
+
+# Add to environments
+conda config --add envs_dirs /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/
+```
+

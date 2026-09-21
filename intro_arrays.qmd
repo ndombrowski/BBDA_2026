@@ -1,0 +1,194 @@
+---
+title: |
+    Introduction to
+
+    writing SLURM arrays
+
+author: "Nina Dombrowski"
+output-dir: docs
+
+format: 
+    revealjs:
+        theme: config/slides.scss
+        css: config/styles.css
+        chalkboard: false
+        highlight-style: a11y
+        embed-resources: true
+
+engine: knitr
+eval: false
+code-annotations: below
+
+revealjs-plugins:
+    - pointer
+---
+
+## Why SLURM arrays?
+
+:::{.incremental}
+* Many data analysis tasks need to re run on **multiple samples** 
+* Instead of writing one job script per sample we can use **for-loops** to run all jobs at once one after the other 
+* We can also use  **job arrays** to run multiple jobs at once and several jobs at the same time
+::: 
+
+::: {.fragment}
+Advantages:
+
+* Less code repetition
+* Easier to manage code
+* More efficient on the cluster
+:::
+
+
+## Job arrays in practice
+
+* To tell SLRUM to run an array we can add the `--array` directive at the top of our script. 
+
+. . . 
+
+* For example, if we have 6 samples that we want to run our script on, we add the following at the top of our script:
+
+    ```{.bash code-line-numbers="false"}
+    #SBATCH --array=1-6
+    ```
+
+    This tells SLURM to create 6 independent **array tasks** numbered from 1-6.
+
+. . .
+
+* Since we do not want to use every single node on the HPC, we can also tell SLURM how many hows we want to run at the same time.
+
+    ```{.bash code-line-numbers="false"}
+    #SBATCH --array=1-6%2
+    ```
+
+    The `%2` tells SLURM to only run 2 of the 6 jobs at the same time.
+
+
+
+## Important SLURM directives
+
+```{.bash}
+#!/bin/bash
+#SBATCH --job-name=fastp
+#SBATCH --array=1-6%2                   # <1>
+#SBATCH --output=logs/fastp_%A_%a.out   # <2>
+#SBATCH --error=logs/fastp_%A_%a.err    # <2>
+#SBATCH --cpus-per-task=4               # <3>
+#SBATCH --mem=20G                       # <3>
+#SBATCH --time=2:00:00
+```
+1. Tell SLURM that we want to run an array with 6 jobs  
+&emsp;`%2` tells SLURM to only run 2 jobs in parallel
+2. Save the logs and errors  
+&emsp;`%A` will be replaced with the job ID  
+&emsp;`%a` will be  replaced with the array index
+3. Define the allocated CPUs and memory for each array task   
+&emsp; Here, you specify the resource required for a single sample 
+
+
+## How do we know which sample to process?
+
+* SLURM sets a variable for each array job:
+
+    ```{.bash code-line-numbers="false"}
+    $SLURM_ARRAY_TASK_ID
+    ```
+
+* We can use this variable to pick the right line in a file or in a list of files that we generate with `ls`
+
+::: {.fragment}
+* Example: Extract the sample ID from `metadata.txt`:
+
+    ```{.bash code-line-numbers="false"}
+    
+    SAMPLE=$(cut -f1 metadata.txt | sed "1d" | sed -n "${SLURM_ARRAY_TASK_ID}p")
+    ```
+:::
+
+
+## Breaking commands down {.smaller}
+
+```{bash}
+#| eval: true 
+#| echo: true
+#| code-line-numbers: false
+cut -f1 metadata.txt
+```
+
+<br>
+
+::: {.fragment}
+```{bash}
+#| eval: true 
+#| echo: true
+#| code-line-numbers: false
+cut -f1 metadata.txt | sed "1d" 
+```
+::: 
+
+<br>
+
+::: {.fragment}
+To extract each sample, one-by-one, we can make use of the `SLURM_ARRAY_TASK_ID`.
+
+```{bash}
+#| eval: false 
+#| echo: true
+#| code-line-numbers: false
+SAMPLE=$(cut -f1 metadata.txt | sed "1d" | sed -n "${SLURM_ARRAY_TASK_ID}p")
+``` 
+::: 
+
+<br>
+
+:::{.fragment}
+To test our code we can replace `SLURM_ARRAY_TASK_ID` with a number from 1-6:
+
+```{bash}
+#| eval: true 
+#| echo: true
+#| code-line-numbers: false
+cut -f1 metadata.txt | sed "1d" | sed -n "2p"
+```
+:::
+
+
+## Example job array script (fastp)
+
+```{bash}
+#| echo: true
+
+#!/bin/bash
+#SBATCH --job-name=fastp
+#SBATCH --output=logs/fastp_%A_%a.out
+#SBATCH --error=logs/fastp_%A_%a.err
+#SBATCH --array=1-6%2
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=20G
+#SBATCH --time=2:00:00
+
+DATA="/zfs/omics/projects/education/BBDA_transcriptomics/denovo/data/"
+SAMPLE=$(cut -f1 metadata.txt | sed "1d" | sed -n "${SLURM_ARRAY_TASK_ID}p")
+
+fastp \
+    -i ${DATA}/${SAMPLE}_1.fastq.gz \
+    -I ${DATA}/${SAMPLE}_2.fastq.gz \
+    -o fastp/${SAMPLE}_1_paired.fastq.gz \
+    -O fastp/${SAMPLE}_2_paired.fastq.gz \
+    --cut_window_size 3 --cut_mean_quality 25 --length_required 50 --thread 4
+```
+
+. . .
+
+* When to use variables
+  * To store file paths, filenames, or parameter that might change. I tmakes them easier to update in one single place
+  * To make your script portable for collaborators you might need to adjust paths
+  * To reduce mistakes. We don't have to repeatedly type long or complicated names
+
+. . .
+
+* How to to use variables:
+  * Define them at the top
+  * Command substitution, `$(...)`, is used to store the output of a command in a variable
+  * Wrap in `{}` to avoid issues when followed by characters

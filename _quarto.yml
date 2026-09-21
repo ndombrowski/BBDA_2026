@@ -1,0 +1,22 @@
+project:
+  output-dir: docs/solution
+  render:
+    - "*.qmd" 
+    - "!random.qmd"
+    - "!installation_guide.qmd"
+    - "!test_run/"
+
+format:
+    html:
+        link-external-icon: true
+        link-external-newwindow: true
+        css: config/styles.css
+        toc: true
+        embed-resources: true
+        theme: cosmo
+
+filters:
+    - config/italics-denovo.lua
+    - config/links.lua
+
+bibliography: config/references.bib

@@ -1,0 +1,7 @@
+runID	treatment
+ERR1211089	untreated
+ERR1211091	untreated
+ERR1211093	untreated
+ERR1211088	treated
+ERR1211090	treated
+ERR1211092	treated
