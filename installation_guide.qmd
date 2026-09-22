@@ -22,5 +22,8 @@ mamba create \
 
 # Add to environments
 conda config --add envs_dirs /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/
+
+# Check permissions 
+
 ```
 

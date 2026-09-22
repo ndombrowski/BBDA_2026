@@ -4,6 +4,7 @@ project:
     - "*.qmd" 
     - "!random.qmd"
     - "!installation_guide.qmd"
+    - "!lesson_planning.md"
     - "!test_run/"
 
 format:

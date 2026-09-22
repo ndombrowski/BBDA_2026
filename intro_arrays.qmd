@@ -7,7 +7,7 @@ title: |
 author: "Nina Dombrowski"
 output-dir: docs
 
-format: 
+format:
     revealjs:
         theme: config/slides.scss
         css: config/styles.css

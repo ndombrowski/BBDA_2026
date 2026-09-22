@@ -1,7 +1,7 @@
 ---
 title: "De novo assembly: Day 1"
 
-engine: knitr 
+engine: knitr
 
 execute:
     eval: false
@@ -9,7 +9,7 @@ execute:
 
 # Introduction
 
-In a previous tutorial you worked on a **reference-guided assembly**, where sequencing reads are aligned to a known reference genome to reconstruct transcripts and identify differentially expressed genes (DEGs). In this tutorial, you'll be introduced to **de novo transcriptome assembly**, or reference-free assembly, where transcripts are assembled using only the information contained in the reads themselves.
+In a previous tutorial you worked on a **reference-guided assembly**, where sequencing reads are aligned to a known reference genome to reconstruct transcripts and identify differentially expressed genes (DEGs). In this tutorial, you will be introduced to **de novo transcriptome assembly**, or reference-free assembly, where transcripts are assembled using only the information contained in the reads themselves.
 
 De novo assembly is useful when no reference genome is available, or when existing references are incomplete or poorly annotated. For example, if a genome has unresolved regions or assembly gaps, reference-guided methods won't be able to reconstruct transcripts in these areas.
 
@@ -81,7 +81,7 @@ mamba create \
 
 ## The data
 
-In this tutorial, we will work with data published by @ruocco2017, who investigated how the seagrass species *Cymodocea nodosa* responds to experimental ocean acidification (OA). OA is a consequence of climate change and arises due to increasing levels of atmospheric $CO_2$ that dissolves into seawater and thereby lowers ocean pH. While some marine species are negatively affected, others may tolerate or even benefit from OA. To explore this further, the authors grew *C. nodosa* under control (400 ppm) and elevated (1200 ppm) $CO_2$ conditions to study which biological pathways are affected by OA.
+In this tutorial, we will work with data published by @ruocco2017, who investigated how the seagrass species *Cymodocea nodosa* responds to experimental ocean acidification (OA). OA is a consequence of climate change and happens because of increasing levels of atmospheric $CO_2$ that dissolves into seawater and thereby lowers ocean pH. While some marine species are negatively affected, others may tolerate or even benefit from OA. To explore this further, the authors grew *C. nodosa* under control (400 ppm) and elevated (1200 ppm) $CO_2$ conditions to study which biological pathways are affected by OA.
 
 For this practical we work with 6 transcriptomic samples: 3 biological replicates that were grown for 15 days under ambient $CO_2$ levels (untreated) and 3 biological replicates that were grown under increased levels of $CO_2$ (treated).
 
@@ -92,6 +92,7 @@ Start by reading the methods section [of the Ruocco et al., manuscript](https://
 2.  What is the read length?
 3.  Was unstranded or stranded sequencing used? If stranded, which strand was sequenced?
 
+Knowing these things is important, also when you work with your own data, since parameters of different tools you use depend on what type of data you work with.
 
 🔎 **Good to Know**
 
@@ -120,13 +121,13 @@ Before you start working with this data, investigate where the authors made the 
 1.  Check the paper's data accessibility section and identify where the authors deposited their sequencing data.
 2.  Go to the data archive that is described in the paper. Is it immediately clear where the raw data, i.e. the FASTQ files, are? How easy is it to retrieve usable sequencing data?
 3.  To dig deeper click `View: EMBL` on the page for sample [HADH01000001](https://www.ebi.ac.uk/ena/browser/view/HADH01000001) and find the Project ID. Use this ID to search in the ENA repository for the sequence reads. How many samples did the authors sequence in total?
-4.  Based on the [sample information on ENA](https://www.ebi.ac.uk/ena/browser/view/PRJEB12372) generate a mapping file, i.e. a file that links the sample IDs with more descriptive information:
-    -   Use the Run Accessions from `/zfs/omics/projects/education/BBDA_transcriptomics/denovo/data` (e.g., ERR1211089) and find the corresponding treatment by exploring the information on ENA that is stored under the Sample Accession. 
+4.  Based on the [sample information on ENA](https://www.ebi.ac.uk/ena/browser/view/PRJEB12372) generate a mapping file, i.e. a file that links the sample IDs with more descriptive information. Specifically, do the following:
+    -   Use the Run Accessions, i.e. ERR1211089, from `/zfs/omics/projects/education/BBDA_transcriptomics/denovo/data` and find the corresponding treatment by exploring the information on ENA that is stored under the Sample Accession. 
     -   Generate a metadata file called `metadata.txt` in your personal folder (`~/personal`). Add two tab-separated headers: runID and treatment. Then add 6 rows with the sample information (3 samples from treated and 3 samples from untreated conditions). 
     - Hint: To have a consistent metadata table, use the term "untreated" for samples from 400 ppm and "treated" for samples grown under 1200 ppm.
     - Hint: If you completely get stuck you can also use the file available in `/zfs/omics/projects/education/BBDA_transcriptomics/denovo/`.
 
-::: {.callout-tip title="Answer" collapse="true" appearance="simple"}
+::: {.callout-tip title="Code example" collapse="true" appearance="simple"}
 1.  The data was deposited in the [European Nucleotide Archive (ENA)](http://www.ebi.ac.uk/ena) under the accessions HADH01000001-HADH01059478.
 2.  On the linked page we can find the assembly as a FASTA file that can be accessed by clicking `SET FASTA`, for example on the page for [HADH01000001](https://www.ebi.ac.uk/ena/browser/view/HADH01000001). However, finding the raw FASTQ data is a bit more difficult. For example, if we click on `Sequence versions: View` we see that we can not actually download any raw data.
 3.  The Project ID is PRJEB12372. We can use this ID to search in ENA using the general search field to find the actual [raw data](https://www.ebi.ac.uk/ena/browser/view/PRJEB12372). We see that there are a total of 9 samples sequenced, 6 of which we are analysing today. The other 3 samples are control samples, i.e. samples that were collected before the actual experiment.
@@ -268,9 +269,17 @@ There is nothing unusual. The sequence quality is good over the whole length of 
 :::
 :::
 
+::: {.callout-tip title="Good to Know: Removing rRNA and contaminant sequences" collapse="false" appearance="simple"}
+You might wonder why we don't remove ribosomal RNA (rRNA) or other contaminating sequences before assembly, even though the introduction on this page mentions it as part of a typical de novo workflow.
+
+For this dataset, we checked the rRNA content beforehand with a dedicated rRNA-detection tool, and it came back low (roughly 1-4.5% of reads per sample). Because of this, and to keep the tutorial close to the trimming strategy used in the original paper, we skip an explicit rRNA-removal step here.
+
+**In a real project**, especially for data that wasn't prepared with polyA selection or a similar mRNA-enrichment step, rRNA content can be much higher and is worth checking. Tools like SortMeRNA or RiboDetector can screen your reads for rRNA and remove matching ones before you spend time and compute assembling them. The same applies to other unwanted sequences, such as reads from a host species or another contaminating organism: check for these and remove them before assembly, for example using tools like kraken2. For this data its not needed and would get quite time-consuming, which is why this tutorial doesn't walk through it.
+:::
+
 ### Quality cleaning
 
-Although our FastQC report showed good quality, this is uncommon in real datasets. Therefore, we will now clean the sequences using `fastp` [@Chen2018]. To learn about the different options of this tool, you can go [here](https://github.com/OpenGene/fastp).
+Although our FastQC report showed good quality, this is uncommon in real datasets. To reproduce the papers workflow, we will now clean the sequences using `fastp` [@Chen2018]. To learn about the different options of this tool, you can go [here](https://github.com/OpenGene/fastp).
 
 For this workflow we'll mimic the trimming strategy from the original paper, which used Trimmomatic with these settings: `SLIDINGWINDOW:3:25 MINLEN:50`. SLIDINGWINDOW is a quality trimming step that looks at a window of 3 bases along the read. If the average quality of the bases in that window drops below 25 then the read will be cut at this point. MINLEN is a length filter that discards any reads shorter than 50 base pairs. 
 
@@ -281,7 +290,7 @@ The reason why we will use fastp instead of Trimmomatic is because it runs faste
 -   `--length_required 50`
 -   `--cut_right`
 
-Since fastp will run for a bit longer and we want to run it on multiple samples, we will now write our first SLURM job script. For this, we could use a [for-loop](https://scienceparkstudygroup.github.io/ibed-bioinformatics-page/source/core_tools/bash-for-loops.html), which would run all 6 fastp steps one after the other. You can also use [SLURM arrays](https://blog.ronin.cloud/slurm-job-arrays/) to parallelize these steps and, for example, run 2 fastp steps at the same time. Because you’ve likely already worked with for-loops, we’ll show you an example of using a SLURM array instead.
+Since fastp will run for a bit longer and we want to run it on multiple samples, we will now write our first SLURM job script. For this, we could use a [for-loop](https://scienceparkstudygroup.github.io/ibed-bioinformatics-page/source/core_tools/bash-for-loops.html), which would run all 6 fastp steps one after the other. You can also use [SLURM arrays](https://blog.ronin.cloud/slurm-job-arrays/) to parallelize these steps and, for example, run 2 fastp steps at the same time. Because you’ve likely already worked with for-loops, the code template below shows an example that makes use of a SLURM array instead.
 
 After the quality cleaning is done, we will repeat the `fastqc` and `seqkit stats` analyses on the quality-cleaned reads in order to see if the quality has improved.
 
@@ -312,10 +321,11 @@ SAMPLE=$(cut -f1 files/metadata.txt | sed "1d" | sed -n "${SLURM_ARRAY_TASK_ID}p
 
 # Run fastp
 # Estimated run time: < 5 min
-# Hints:    - Use the DATA and SAMPLE variables to build file names
+# Hints:    - Make use of the DATA and SAMPLE variables to build the names
+                for the input and output files
 #           - Trim reads where quality drops below 25 in a 3 bp window
 #           - Discard reads shorter than 50 bp
-#           - Save paired outputs in two separate files
+#           - Save the paired outputs, _1 and _2, in two separate files
 #           - Set the threads in accordance with the SLURM allocations
 fastp ...
 '''
