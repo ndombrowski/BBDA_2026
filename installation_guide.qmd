@@ -24,6 +24,10 @@ mamba create \
 conda config --add envs_dirs /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/
 
 # Check permissions 
-
+# (note, that I didn't have the permissions to do this change) 
+ENV=/zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/transcriptomics_bbda
+find "$ENV" -type f ! -perm -o=r | wc -l
+find "$ENV" -type f ! -perm -o=r -exec chmod o+r {} +
+find "$ENV" -type f ! -perm -o=r | wc -l   # expect 0
 ```
 
