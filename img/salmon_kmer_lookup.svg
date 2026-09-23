@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    width="1500"
-   height="730"
-   viewBox="0 0 1500 730"
+   height="800"
+   viewBox="0 0 1500 800"
    font-family="Arial, Helvetica, sans-serif"
    version="1.1"
    id="svg113"
@@ -183,14 +183,14 @@
      font-size="22px"
      font-family="'Courier New', monospace"
      letter-spacing="2"
-     fill="#1f4e91"
+     fill="#8a8a8a"
      id="text33">TTAGG</text>
   <text
      x="190"
      y="379"
      font-size="19px"
-     fill="#1f4e91"
-     id="text35">Isoform 1</text>
+     fill="#8a8a8a"
+     id="text35">Isoforms 1, 2, 3</text>
   <text
      x="40"
      y="415"
@@ -198,7 +198,7 @@
      font-family="'Courier New', monospace"
      letter-spacing="2"
      fill="#1f4e91"
-     id="text37">GCCAT</text>
+     id="text37">TTGCA</text>
   <text
      x="190"
      y="415"
@@ -211,14 +211,14 @@
      font-size="22px"
      font-family="'Courier New', monospace"
      letter-spacing="2"
-     fill="#1f4e91"
-     id="text41">ATTGC</text>
+     fill="#8a8a8a"
+     id="text41">CCAGC</text>
   <text
      x="190"
      y="451"
      font-size="19px"
-     fill="#1f4e91"
-     id="text43">Isoform 1</text>
+     fill="#8a8a8a"
+     id="text43">Isoforms 2, 3</text>
   <text
      x="40"
      y="487"
@@ -240,7 +240,7 @@
      font-family="'Courier New', monospace"
      letter-spacing="2"
      fill="#2e7d32"
-     id="text49">CCAGC</text>
+     id="text49">TTGCC</text>
   <text
      x="190"
      y="523"
@@ -355,24 +355,27 @@
        id="tspan534-9"
        x="706.57928"
        y="648.94434"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'">→ each transcript accumulates matched reads</tspan><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'">→ each transcript accumulates matched reads, per sample</tspan><tspan
        sodipodi:role="line"
        x="706.57928"
        y="673.94434"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'"
-       id="tspan640">→ a statistical model turns those counts into abundance estimates,</tspan><tspan
+       id="tspan640">→ reads matching multiple transcripts (like the gray rows) are split</tspan><tspan
        sodipodi:role="line"
        x="706.57928"
        y="698.94434"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'"
-       id="tspan642"><tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif';fill:#ffffff;fill-opacity:1"
-   id="tspan1204">dd</tspan>(and corrects for GC and positional bias)</tspan><tspan
+       id="tspan642">   between them, not double-counted</tspan><tspan
        sodipodi:role="line"
        x="706.57928"
        y="723.94434"
        id="tspan540-4"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'" /></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'">→ a statistical model turns this into final abundance estimates,</tspan><tspan
+       sodipodi:role="line"
+       x="706.57928"
+       y="748.94434"
+       id="tspan540-5"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Arial, Helvetica, sans-serif;-inkscape-font-specification:'Arial, Helvetica, sans-serif'">   correcting for GC and positional bias</tspan></text>
   <text
      x="677.66943"
      y="304.10986"
@@ -486,4 +489,16 @@
        id="tspan542"
        x="674.38019"
        y="693.28925"> </tspan></text>
+  <text
+     x="40"
+     y="728"
+     font-size="17px"
+     fill="#555555"
+     id="text-note-1">A k-mer can belong to more than one transcript (gray rows) —</text>
+  <text
+     x="40"
+     y="750"
+     font-size="17px"
+     fill="#555555"
+     id="text-note-2">Salmon tracks every match; Step 3's model resolves which one a read came from.</text>
 </svg>
