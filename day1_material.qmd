@@ -44,8 +44,8 @@ The tools we use in this tutorial include:
 - SeqKit v2.7.0
 - fastp v0.26.0
 - Trinity v2.15.2 (conda)
-- BUSCO v5.8.0 (conda)
-- TransDecoder v5.7.1 (conda)
+- BUSCO v6.1.0 (conda)
+- TransDecoder v6.0.0 (conda)
 - HMMER v3.3.2 
 
 **The conda environments can be activated with the following commands**:
@@ -64,13 +64,21 @@ If you want to install software yourself, you can find the commands to install y
 ## Installation notes
 
 ```{bash}
+# Install busco and transdecoder
 mamba create \
     -p <your_path>/transcriptomics_bbda \
     -c bioconda -c conda-forge \
-    python=3.10.15 \
-    busco=5.8.0 \
-    transdecoder=5.7.1 
+    busco=6.1.0 \
+    transdecoder=6.0.0
 
+# Work around a bioconda packaging bug in transdecoder=6.0.0: its build script
+# was not updated for a new folder layout, so the new `TransDecoder` wrapper
+# never gets linked into bin/. The script itself is still installed under opt/,
+# so link it in manually:
+ln -s <your_path>/transcriptomics_bbda/opt/transdecoder/TransDecoder \
+      <your_path>/transcriptomics_bbda/bin/TransDecoder
+
+# Install trintity separately since it has many dependencies
 mamba create \
     -p <your_path>/trinity_bbda \
     -c bioconda -c conda-forge \
@@ -345,7 +353,7 @@ SAMPLE=$(cut -f1 files/metadata.txt | sed "1d" | sed -n "${SLURM_ARRAY_TASK_ID}p
 # Run fastp
 # Estimated run time: < 5 min
 # Hints:    - Make use of the DATA and SAMPLE variables to build the names
-                for the input and output files
+#             for the input and output files
 #           - Trim reads where quality drops below 25 in a 3 bp window
 #           - Discard reads shorter than 50 bp
 #           - Save the paired outputs, _1 and _2, in two separate files

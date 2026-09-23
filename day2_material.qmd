@@ -97,8 +97,8 @@ How does your assembly compare to the numbers reported in the paper?
 ## Answer
 
 1.  Comparison to the paper:
-    1.  Your assembly likely produced around 80,000 transcripts, which is less than the \~170,000 reported in the original study. The difference is expected because we worked with subsampled reads to reduce the computational load. This is a good example for how reducing sequencing depth might result in an under-representation of lowly expressed transcripts.
-    2.  The N50 value should be around 2,200 bp, which suggests the assembly quality is in line with the original study despite having fewer input reads.
+    1.  Your assembly likely produced  ~80,000 transcripts, which is less than the \~170,000 reported in the original study. The difference is expected because we worked with subsampled reads to reduce the computational load. This is a good example for how reducing sequencing depth might result in an under-representation of lowly expressed transcripts.
+    2.  The N50 value should be around 2,000 bp, which suggests the assembly quality is in line with the original study despite having fewer input reads.
 
 🔎 **Good to Know**
 
@@ -156,6 +156,8 @@ Since we do have a lot of things planned for today, only work on this section on
 
 [BUSCO](https://busco.ezlab.org/busco_userguide.html) (Benchmarking Universal Single-Copy Orthologs) is a tool to assess the completeness of genome or transcriptome assemblies [@Simão2015]. It does so by searching for a set of highly conserved single-copy genes that should be present in nearly all members of a given taxonomic group.
 
+To pick a good marker gene set, first look up where your species sits in the taxonomic tree, for example with the [NCBI Taxonomy Browser](https://ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi), and then check which lineages BUSCO actually has a marker set for (run `busco --list-datasets` to see all of them). NCBI places *Cymodocea nodosa* under Liliopsida (the monocots), inside the order Alismatales and family Cymodoceaceae. BUSCO does not offer a marker set for Alismatales or Cymodoceaceae, so `liliopsida_odb12.2` is the most specific, and therefore most informative, marker set currently available for this species.
+
 ```{bash}
 # Create an output directory
 ...
@@ -163,8 +165,9 @@ Since we do have a lot of things planned for today, only work on this section on
 # Run BUSCO  
 # Estimated run time: ~ 20 min
 # Hints:    - Ensure that you use BUSCO in a mode that is suited for transcriptomes 
-#           - Ensure that it is run in a mode suitable for eukaryotes 
-#             (i.e. use eukaryota_odb10, a very general eukaryotic marker gene set)
+#           - Ensure that it is run with the marker gene set that best matches
+#             our species (i.e. use liliopsida_odb12.2, see the paragraph above
+#             for why this is the best available choice)
 #           - BUSCO can be accessed with the `transcriptomics_bbda` conda environment
 #           - Use 10 CPUs and 50G of memory
 ...
@@ -184,7 +187,7 @@ srun --cpus-per-task 10 --mem=50G busco \
     -i trinity/trinity.Trinity.fasta \
     -m transcriptome -f \
     -c 10 --out trinity/busco \
-    -l eukaryota_odb10 
+    -l liliopsida_odb12.2 
 
 conda deactivate
 ```
@@ -238,15 +241,15 @@ We will use [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) to
 # Prepare an output folder
 ...
 
-# Run TransDecoder 
-# Estimated run time: ~ 5 + 15 min
+# Run TransDecoder
+# Estimated run time: ~ 20 min
 # Hints:  - Transdecoder can be accessed via the `transcriptomics_bbda` environment
-#         - Transdecoder consists of two steps that are run separately 
-#               1. `TransDecoder.LongOrfs` to find long open reading frames 
-#               2. `TransDecoder.Predict` to predict cds and proteins
+#         - TransDecoder now runs as a single command that internally finds long
+#           open reading frames (ORFs) first, then predicts which ones are likely
+#           real coding regions
 #         - Ensure that you account for strand information
-#         - Make use of the gene to transcript map in step 1
-#         - Ensure that in step 2 you only produce a single output cds sequence/transcript to simplify our analysis
+#         - Make use of the gene to transcript map
+#         - Ensure that you only produce a single output cds sequence/transcript to simplify our analysis
 #         - Use srun with 1 CPU and 20G of memory
 ...
 
@@ -265,16 +268,13 @@ We will use [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) to
 mkdir annotations
 
 # Run transdecoder 
-conda activate transcriptomics_bbda
+conda activate /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/transcriptomics_bbda
 
-srun --cpus-per-task 1 --mem=20G TransDecoder.LongOrfs -t trinity/trinity.Trinity.fasta \
+srun --cpus-per-task 1 --mem=20G TransDecoder -t trinity/trinity.Trinity.fasta \
     --gene_trans_map trinity/trinity.Trinity.fasta.gene_trans_map \
     -S \
-    --output_dir annotations
-
-srun --cpus-per-task 1 --mem=20G TransDecoder.Predict -t trinity/trinity.Trinity.fasta \
     --single_best_only \
-    --output_dir annotations  
+    --output_dir annotations
 
 # Simplify the header
 cut -f1 -d " " annotations/trinity.Trinity.fasta.transdecoder.pep > annotations/Trinity.fasta.transdecoder_short.pep
