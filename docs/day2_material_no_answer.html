@@ -2285,7 +2285,7 @@ vertical-align: -.125em;
 <ul>
 <li><strong>Fragmentation and contig length</strong>. If your assembly contains many short contigs (less than 200 bp) it may be very fragmented. Ideally, you want fewer, longer contigs.</li>
 <li><strong>Read support/Read mapping rate</strong>. This metric measures how well the original reads map back to the assembled transcripts. A good assembly should have &gt;80% of reads mapping back to the assembly.</li>
-<li><strong>Transcriptome completeness</strong>. This metric measures how complete your assembly is. You can assess this by checking how many conserved, single-copy genes (orthologues) are present in the assembly. This can be calculated with tools like BUSCO. A good assembly should have a completeness &gt;80%.</li>
+<li><strong>Transcriptome completeness</strong>. This metric measures how complete your assembly is. You can assess this by checking how many conserved, single-copy genes (orthologues) are present in the assembly. This can be calculated with tools like BUSCO. A good assembly generally falls in the 80-90% completeness range, though the exact cutoff depends on how many marker genes were used.</li>
 </ul>
 <section id="cleanup-and-getting-basic-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="cleanup-and-getting-basic-statistics">Cleanup and getting basic statistics</h3>
@@ -2345,6 +2345,7 @@ vertical-align: -.125em;
 </div>
 </div>
 <p><a href="https://busco.ezlab.org/busco_userguide.html" target="_blank" rel="noopener noreferrer">BUSCO</a> (Benchmarking Universal Single-Copy Orthologs) is a tool to assess the completeness of genome or transcriptome assemblies <span class="citation" data-cites="Simão2015">(<a href="#ref-Simão2015" role="doc-biblioref">Simão et al. 2015</a>)</span>. It does so by searching for a set of highly conserved single-copy genes that should be present in nearly all members of a given taxonomic group.</p>
+<p>To pick a good marker gene set, first look up where your species sits in the taxonomic tree, for example with the <a href="https://ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi" target="_blank" rel="noopener noreferrer">NCBI Taxonomy Browser</a>, and then check which lineages BUSCO actually has a marker set for (run <code>busco --list-datasets</code> to see all of them). NCBI places <em>Cymodocea nodosa</em> under Liliopsida (the monocots), inside the order Alismatales and family Cymodoceaceae. BUSCO does not offer a marker set for Alismatales or Cymodoceaceae, so <code>liliopsida_odb12.2</code> is the most specific, and therefore most informative, marker set currently available for this species.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an output directory</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
@@ -2352,11 +2353,12 @@ vertical-align: -.125em;
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run BUSCO  </span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated run time: ~ 20 min</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Hints:    - Ensure that you use BUSCO in a mode that is suited for transcriptomes </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Ensure that it is run in a mode suitable for eukaryotes </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#             (i.e. use eukaryota_odb10, a very general eukaryotic marker gene set)</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#           - BUSCO can be accessed with the `transcriptomics_bbda` conda environment</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Use 10 CPUs and 50G of memory</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Ensure that it is run with the marker gene set that best matches</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#             our species (i.e. use liliopsida_odb12.2, see the paragraph above</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#             for why this is the best available choice)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#           - BUSCO can be accessed with the `transcriptomics_bbda` conda environment</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Use 10 CPUs and 50G of memory</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-simple callout-note callout-titled" title="Question">
 <div class="callout-header d-flex align-content-center">
@@ -2399,15 +2401,15 @@ vertical-align: -.125em;
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare an output folder</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run TransDecoder </span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated run time: ~ 5 + 15 min</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run TransDecoder</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated run time: ~ 20 min</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Hints:  - Transdecoder can be accessed via the `transcriptomics_bbda` environment</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Transdecoder consists of two steps that are run separately </span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#               1. `TransDecoder.LongOrfs` to find long open reading frames </span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#               2. `TransDecoder.Predict` to predict cds and proteins</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         - TransDecoder now runs as a single command that internally finds long</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#           open reading frames (ORFs) first, then predicts which ones are likely</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#           real coding regions</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Ensure that you account for strand information</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Make use of the gene to transcript map in step 1</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Ensure that in step 2 you only produce a single output cds sequence/transcript to simplify our analysis</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Make use of the gene to transcript map</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Ensure that you only produce a single output cds sequence/transcript to simplify our analysis</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Use srun with 1 CPU and 20G of memory</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
@@ -2645,6 +2647,7 @@ vertical-align: -.125em;
 </tr>
 </tbody>
 </table>
+<p>Don’t worry if your own DEG count doesn’t match any of the numbers above exactly, including the answer key further up. The point isn’t the specific number, but that small differences in software versions or filtering choices can shift the result by tens of genes.</p>
 <p>The <code>filterThreshold</code> is an automatically calculated cutoff used in DESeq2’s independent filtering. It represents the minimum mean normalized count that a gene should have to be included in multiple testing correction. You can check the used threshold with <code>metadata(res)$filterThreshold</code>.</p>
 <p>So when writing code:</p>
 <ul>
