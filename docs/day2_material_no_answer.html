@@ -2284,7 +2284,7 @@ vertical-align: -.125em;
 <p>Unlike reference-guided methods, evaluating a <em><em>de novo</em></em> assembly can be challenging since we lack a reference genome. However, there are different metrics that can be used and many can be computed with helper scripts included in Trinity. Some key metrics:</p>
 <ul>
 <li><strong>Fragmentation and contig length</strong>. If your assembly contains many short contigs (less than 200 bp) it may be very fragmented. Ideally, you want fewer, longer contigs.</li>
-<li><strong>Read support/Read mapping rate</strong>. This metric measures how well the original reads map back to the assembled transcripts. A good assembly should have &gt;80% of reads mapping back to the assembly.</li>
+<li><strong>Read support/Read mapping rate</strong>. This metric measures how well the original reads map back to the assembled transcripts. A good assembly should have &gt;80% of reads mapping back to the assembly. You will get this number later today from the Salmon log file, when you quantify expression.</li>
 <li><strong>Transcriptome completeness</strong>. This metric measures how complete your assembly is. You can assess this by checking how many conserved, single-copy genes (orthologues) are present in the assembly. This can be calculated with tools like BUSCO. A good assembly generally falls in the 80-90% completeness range, though the exact cutoff depends on how many marker genes were used.</li>
 </ul>
 <section id="cleanup-and-getting-basic-statistics" class="level3">
@@ -2330,6 +2330,8 @@ vertical-align: -.125em;
 <p>How does your assembly compare to the numbers reported in the paper?</p>
 </div>
 </div>
+<p>🔎 <strong>Good to Know</strong></p>
+<p>Look at the first lines of the TrinityStats output: Trinity reports fewer ‘genes’ than transcripts. The transcript names show why. In <code>TRINITY_DN27172_c0_g1_i1</code>, the part before <code>_i1</code> (<code>TRINITY_DN27172_c0_g1</code>) is the gene ID and <code>_i1</code> is the isoform number. Trinity groups transcripts that look like they come from the same gene, so one ‘gene’ can have several isoforms (<code>_i1</code>, <code>_i2</code>, …). The file <code>trinity.Trinity.fasta.gene_trans_map</code> lists this grouping. Keep in mind that a Trinity ‘gene’ is a computational grouping, not a confirmed gene.</p>
 </section>
 <section id="assess-transcriptome-completeness" class="level3">
 <h3 class="anchored" data-anchor-id="assess-transcriptome-completeness">Assess transcriptome completeness</h3>
@@ -2407,7 +2409,7 @@ vertical-align: -.125em;
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         - TransDecoder now runs as a single command that internally finds long</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#           open reading frames (ORFs) first, then predicts which ones are likely</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#           real coding regions</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Ensure that you account for strand information</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Ensure that you account for the library type (strandedness): check the TransDecoder options for strand-specific transcripts</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Make use of the gene to transcript map</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Ensure that you only produce a single output cds sequence/transcript to simplify our analysis</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#         - Use srun with 1 CPU and 20G of memory</span></span>
@@ -2418,6 +2420,22 @@ vertical-align: -.125em;
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># That is a useful habit in order to keep protein (and names in general) short and simple</span></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># It is also useful if you want to, for example, parse annotations further down the line</span></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled" title="Good to Know">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Good to Know
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The <code>-S</code> option tells TransDecoder to only search the top strand of each transcript for ORFs, so 3 instead of 6 reading frames. This is only safe if all transcripts have the same orientation as the original mRNA (the sense strand). Because we ran Trinity with <code>--SS_lib_type RF</code>, Trinity reports our transcripts in sense orientation. For an unstranded assembly, transcripts can have either orientation, so you should not use <code>-S</code>, otherwise you would miss ORFs on the other strand.</p>
+</div>
+</div>
 </div>
 </section>
 <section id="functional-annotation" class="level3">
@@ -2504,7 +2522,7 @@ vertical-align: -.125em;
 </section>
 <section id="identifying-differentially-expressed-genes" class="level2">
 <h2 class="anchored" data-anchor-id="identifying-differentially-expressed-genes">Identifying differentially expressed genes</h2>
-<p>There are several methods for estimating transcript abundance in a genome-free manner, and these include alignment-based methods (aligning reads to the transcript assembly) and alignment-free methods (typically examining k-mer abundances in the reads and in the resulting assemblies).</p>
+<p>There are several methods for estimating transcript abundance in a genome-free manner, and these include alignment-based methods (aligning reads to the transcript assembly) and alignment-free methods (which assign reads to transcripts by matching k-mers against an index of the transcripts, instead of aligning every base).</p>
 <p>In this section, we will make use of a Trinity helper script to quantify transcript and gene-level abundances of each of our 6 samples using the alignment-free method salmon <span class="citation" data-cites="Patro2017">(<a href="#ref-Patro2017" role="doc-biblioref">Patro et al. 2017</a>)</span>.</p>
 <section id="quantification-with-salmon" class="level3">
 <h3 class="anchored" data-anchor-id="quantification-with-salmon">Quantification with salmon</h3>
@@ -2514,7 +2532,7 @@ vertical-align: -.125em;
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Hints:    - Check the trinity documentation and find a perl helper script that can be used to quantify with salmon</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Submit this via sbatch with 4 CPUs, 20G of memory and a 2h hour run time </span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Ensure that you activate the transcriptomics_bbda conda environment</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Do not forget about strand orientation </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Do not forget the library type from Question 3 on day 1 </span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Use `--gene_trans_map  xxx/Trinity.fasta.gene_trans_map` to quantify on transcript as well as gene level</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Add `--prep_reference` to build a target index</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
@@ -2594,6 +2612,8 @@ vertical-align: -.125em;
 <li>Identify differentially expressed genes. Hint: In the <code>results()</code> function, use reasonable cutoffs for alpha and lfcThreshold to focus on “high-confidence” DEGs</li>
 <li>Add the information from the annotations to the results to be able to quickly screen the list for genes of interest.</li>
 </ol>
+<p>🔎 <strong>Good to Know</strong></p>
+<p>We quantify at transcript and gene level, but use the gene level for the DEG analysis. Isoforms of a gene share a lot of sequence, so many reads could come from more than one isoform. Salmon splits such reads between the isoforms (as in the lecture), which makes isoform-level estimates uncertain. Adding up the isoforms of a gene reduces this problem, because a read from any isoform counts towards the gene.</p>
 <div class="callout callout-style-simple callout-note callout-titled" title="Question">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">

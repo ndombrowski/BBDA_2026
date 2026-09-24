@@ -98,22 +98,26 @@ Start by reading the methods section [of the Ruocco et al., manuscript](https://
 
 1.  Are the reads we work with single-end or paired-end?
 2.  What is the read length?
-3.  Was unstranded or stranded sequencing used? If stranded, which strand was sequenced?
+3.  Was an unstranded or stranded sequencing protocol used? If stranded, which library type (RF or FR) was used?
 
 Knowing these things is important, also when you work with your own data, since parameters of different tools you use depend on what type of data you work with.
 
 🔎 **Good to Know**
 
-In transcriptomics it is important to know which strand was sequenced as this affects downstream steps. You may encounter the following terminology when exploring the manuals of different software tools:
+In transcriptomics it is important to know what library type was used to generate the data, as this affects downstream steps. You may encounter the following terminology when exploring the manuals of different software tools:
 
 <center>![](img/strands.png){width="70%"}</center>
+
+How to read the figure: the purple bar is the transcript. Blue arrows have the same sequence as the transcript (sense), green arrows have the opposite sequence (antisense). R1 (bold) is read 1 and R2 is read 2 of a read pair, and the dashed line is the part of the fragment that is not sequenced. In a direct stranded library, read 1 runs in the same direction as the transcript. In a reverse stranded library, read 1 runs opposite to it. In an unstranded library both happen, so you cannot tell which strand a read came from.
+
+\*During library prep the RNA is first copied into first-strand cDNA (antisense sequence), followed by second-strand cDNA (sense sequence). The name tells you which of the two has the same sequence as read 1.
 
 ::: {.callout-tip title="Answer" collapse="true" appearance="simple"}
 1.  We work with paired-end sequencing data that was generated using the Illumina HiSeq 1000 platform.
 2.  The reads are 100 bp long.
 3.  We work with reverse stranded sequencing data. Two parts of the methods section tell you more about this:
-    -   The authors used the Illumina TruSeq® Stranded mRNA protocol to prepare the sequencing libraries. If you search for more information about this kit online, you will also find the direction of the strand. According to [Illumina documentation]((https://knowledge.illumina.com/library-preparation/rna-library-prep/library-preparation-rna-library-prep-reference_material-list/000002238)), Read 1 maps to the antisense strand, and Read 2 to the sense strand, meaning a reverse stranded protocol was used.
-    -   If you look into the assembly settings you will find that Trinity was run with the argument `SS_lib_type RF`, which also confirms that we work with reverse stranded data.
+    -   The authors used the Illumina TruSeq® Stranded mRNA protocol to prepare the sequencing libraries. If you search for more information about this kit online, you will also find the direction of the strand. According to [Illumina documentation](https://knowledge.illumina.com/library-preparation/rna-library-prep/library-preparation-rna-library-prep-reference_material-list/000002238), Read 1 is antisense to the transcript, and Read 2 to the sense strand, meaning a reverse stranded protocol was used.
+    -   If you look into the assembly settings you will find that Trinity was run with the argument `--SS_lib_type RF`, which also confirms that we work with reverse stranded data.
 :::
 :::
 
@@ -456,7 +460,7 @@ awk 'BEGIN{OFS="\t"}
 # Hints: - Ensure that you activate the `trinity_bbda` conda environment in your script
 #        - `source ~/.bashrc` is needed to activate conda inside a compute node
 #        - In the SLURM directives ask for 10 CPUs, 50G and 24 hours of run time
-#        - Ensure that you account for the read strand
+#        - Ensure that you set the library type you found in Question 3 ("The data")
 #        - use the argument `--samples_file` to work with all 6 samples at once
 #        - use the settings: --max_memory 50G --inchworm_cpu 10 --CPU 10 
 #                            --min_kmer_cov 2 --full_cleanup --output trinity/trinity
@@ -518,7 +522,7 @@ sbatch scripts/trinity.sh
 :::
 
 ::: {.callout-tip title="Good to Know" collapse="true" appearance="simple"}
-You might notice that the Trinity command above leaves out a few settings the original paper used: `SS_lib_type RF –normalize_reads –inchworm_cpu 24 –bflyHeapSpaceInit 24G –bflyHeapSpaceMax 240G –CPU 24 –jaccard_clip –min_kmer_cov 2`. Two of these are worth knowing about:
+You might notice that the Trinity command above leaves out a few settings the original paper used: `--SS_lib_type RF --normalize_reads --inchworm_cpu 24 --bflyHeapSpaceInit 24G --bflyHeapSpaceMax 240G --CPU 24 --jaccard_clip --min_kmer_cov 2`. Two of these are worth knowing about:
 
 -   **`--normalize_reads` is no longer something you need to set.** Trinity has performed in silico read normalization by default since 2016, well before the version used in this course (v2.15.2). The flag is still accepted for backwards compatibility, but it does nothing; normalization only turns off if you explicitly add `--no_normalize_reads`. So even though our command doesn't mention it, normalization is still happening.
 -   **`--jaccard_clip` was deliberately left out.** This option helps resolve fused transcripts in densely packed genomes, but it adds extra runtime and memory. To keep the assembly step manageable within a practical session, we skip it here.

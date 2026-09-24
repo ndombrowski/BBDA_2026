@@ -36,7 +36,7 @@ De novo transcriptome assemblies are not error free. The assembler and the param
 Unlike reference-guided methods, evaluating a *de novo* assembly can be challenging since we lack a reference genome. However, there are different metrics that can be used and many can be computed with helper scripts included in Trinity. Some key metrics:
 
 -   **Fragmentation and contig length**. If your assembly contains many short contigs (less than 200 bp) it may be very fragmented. Ideally, you want fewer, longer contigs.
--   **Read support/Read mapping rate**. This metric measures how well the original reads map back to the assembled transcripts. A good assembly should have \>80% of reads mapping back to the assembly.
+-   **Read support/Read mapping rate**. This metric measures how well the original reads map back to the assembled transcripts. A good assembly should have \>80% of reads mapping back to the assembly. You will get this number later today from the Salmon log file, when you quantify expression.
 -   **Transcriptome completeness**. This metric measures how complete your assembly is. You can assess this by checking how many conserved, single-copy genes (orthologues) are present in the assembly. This can be calculated with tools like BUSCO. A good assembly generally falls in the 80-90% completeness range, though the exact cutoff depends on how many marker genes were used.
 
 ### Cleanup and getting basic statistics
@@ -146,6 +146,10 @@ Stats based on ALL transcript contigs:
 :::
 :::
 
+🔎 **Good to Know**
+
+Look at the first lines of the TrinityStats output: Trinity reports fewer 'genes' than transcripts. The transcript names show why. In `TRINITY_DN27172_c0_g1_i1`, the part before `_i1` (`TRINITY_DN27172_c0_g1`) is the gene ID and `_i1` is the isoform number. Trinity groups transcripts that look like they come from the same gene, so one 'gene' can have several isoforms (`_i1`, `_i2`, ...). The file `trinity.Trinity.fasta.gene_trans_map` lists this grouping. Keep in mind that a Trinity 'gene' is a computational grouping, not a confirmed gene.
+
 ### Assess transcriptome completeness
 
 ::: {.callout-important collapse="false" appearance="simple"}
@@ -249,7 +253,7 @@ We will use [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) to
 #         - TransDecoder now runs as a single command that internally finds long
 #           open reading frames (ORFs) first, then predicts which ones are likely
 #           real coding regions
-#         - Ensure that you account for strand information
+#         - Ensure that you account for the library type (strandedness): check the TransDecoder options for strand-specific transcripts
 #         - Make use of the gene to transcript map
 #         - Ensure that you only produce a single output cds sequence/transcript to simplify our analysis
 #         - Use srun with 1 CPU and 20G of memory
@@ -283,6 +287,10 @@ cut -f1 -d " " annotations/trinity.Trinity.fasta.transdecoder.pep > annotations/
 
 conda deactivate
 ```
+:::
+
+::: {.callout-tip title="Good to Know" collapse="true" appearance="simple"}
+The `-S` option tells TransDecoder to only search the top strand of each transcript for ORFs, so 3 instead of 6 reading frames. This is only safe if all transcripts have the same orientation as the original mRNA (the sense strand). Because we ran Trinity with `--SS_lib_type RF`, Trinity reports our transcripts in sense orientation. For an unstranded assembly, transcripts can have either orientation, so you should not use `-S`, otherwise you would miss ORFs on the other strand.
 :::
 
 ### Functional annotation
@@ -426,7 +434,7 @@ cut -f2 annotations/KEGG/sequence_results_best_hit.txt | sort | uniq | wc -l
 
 ## Identifying differentially expressed genes
 
-There are several methods for estimating transcript abundance in a genome-free manner, and these include alignment-based methods (aligning reads to the transcript assembly) and alignment-free methods (typically examining k-mer abundances in the reads and in the resulting assemblies).
+There are several methods for estimating transcript abundance in a genome-free manner, and these include alignment-based methods (aligning reads to the transcript assembly) and alignment-free methods (which assign reads to transcripts by matching k-mers against an index of the transcripts, instead of aligning every base).
 
 In this section, we will make use of a Trinity helper script to quantify transcript and gene-level abundances of each of our 6 samples using the alignment-free method salmon [@Patro2017].
 
@@ -438,7 +446,7 @@ In this section, we will make use of a Trinity helper script to quantify transcr
 # Hints:    - Check the trinity documentation and find a perl helper script that can be used to quantify with salmon
 #           - Submit this via sbatch with 4 CPUs, 20G of memory and a 2h hour run time 
 #           - Ensure that you activate the transcriptomics_bbda conda environment
-#           - Do not forget about strand orientation 
+#           - Do not forget the library type from Question 3 on day 1 
 #           - Use `--gene_trans_map  xxx/Trinity.fasta.gene_trans_map` to quantify on transcript as well as gene level
 #           - Add `--prep_reference` to build a target index
 ...
@@ -570,6 +578,10 @@ After transcriptome assembly and annotation, differential gene expression (DGE) 
 5.  Optional: Visualize the data with a PCA. This is a good sanity check to ensure that the replicates cluster as expected.
 6.  Identify differentially expressed genes. Hint: In the `results()` function, use reasonable cutoffs for alpha and lfcThreshold to focus on "high-confidence" DEGs
 7.  Add the information from the annotations to the results to be able to quickly screen the list for genes of interest.
+
+🔎 **Good to Know**
+
+We quantify at transcript and gene level, but use the gene level for the DEG analysis. Isoforms of a gene share a lot of sequence, so many reads could come from more than one isoform. Salmon splits such reads between the isoforms (as in the lecture), which makes isoform-level estimates uncertain. Adding up the isoforms of a gene reduces this problem, because a read from any isoform counts towards the gene.
 
 ::: {.callout-caution collapse="true" appearance="simple"}
 ## Code example
