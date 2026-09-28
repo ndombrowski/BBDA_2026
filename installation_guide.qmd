@@ -43,5 +43,49 @@ ENV=/zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/transcriptomi
 find "$ENV" -type f ! -perm -o=r | wc -l
 find "$ENV" -type f ! -perm -o=r -exec chmod o+r {} +
 find "$ENV" -type f ! -perm -o=r | wc -l   # expect 0
+
+ENV=/zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/test
+find "$ENV" -type f ! -perm -o=r | wc -l
+find "$ENV" -type f ! -perm -o=r -exec chmod o+r {} +
+find "$ENV" -type f ! -perm -o=r | wc -l   # expect 0
 ```
 
+
+```{bash}
+# # Test install of trinity in 2026, to ensure that we dont run into any dependencies bug
+# mamba create \
+#     -p /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/test \
+#     -c bioconda -c conda-forge \
+#     trinity=2.15.2
+
+# Do test run
+DATA="/zfs/omics/projects/education/BBDA_transcriptomics/denovo/data"
+wdir="/zfs/omics/projects/education/BBDA_transcriptomics/denovo/testing"
+
+cd $wdir
+
+# Trinty 
+# Prepare the SLURM script scripts/trinity.sh:
+'''
+#!/bin/bash
+#SBATCH --job-name=trinity
+#SBATCH --output=logs/trinity_test_%j.out
+#SBATCH --error=logs/trinity_test_%j.err
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=50G
+#SBATCH --time=24:00:00
+
+# activate conda environment
+source ~/.bashrc
+conda activate /zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/test
+
+# Run trinity
+Trinity --seqType fq --max_memory 50G --samples_file files/trinity_mapping.txt \
+    --SS_lib_type RF  --inchworm_cpu 10 --CPU 10 \
+    --min_kmer_cov 2 --full_cleanup \
+    --output temp/trinity
+'''
+
+# Submit the job
+sbatch scripts/trinity_test.sh
+```
