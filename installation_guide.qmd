@@ -44,7 +44,7 @@ find "$ENV" -type f ! -perm -o=r | wc -l
 find "$ENV" -type f ! -perm -o=r -exec chmod o+r {} +
 find "$ENV" -type f ! -perm -o=r | wc -l   # expect 0
 
-ENV=/zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/test
+ENV=/zfs/omics/projects/education/BBDA_transcriptomics/denovo/envs/trinity_bbda
 find "$ENV" -type f ! -perm -o=r | wc -l
 find "$ENV" -type f ! -perm -o=r -exec chmod o+r {} +
 find "$ENV" -type f ! -perm -o=r | wc -l   # expect 0

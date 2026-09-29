@@ -112,6 +112,8 @@ How to read the figure: the purple bar is the transcript. Blue arrows have the s
 
 \*During library prep the RNA is first copied into first-strand cDNA (antisense sequence), followed by second-strand cDNA (sense sequence). The name tells you which of the two has the same sequence as read 1.
 
+Why this matters: some genes overlap on opposite strands of the genome. With unstranded data, reads from both genes look the same, so Trinity may join them into one merged transcript. With stranded data, Trinity knows which strand each read came from and keeps the two genes apart.
+
 ::: {.callout-tip title="Answer" collapse="true" appearance="simple"}
 1.  We work with paired-end sequencing data that was generated using the Illumina HiSeq 1000 platform.
 2.  The reads are 100 bp long.

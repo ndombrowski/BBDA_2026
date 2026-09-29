@@ -445,7 +445,7 @@ In this section, we will make use of a Trinity helper script to quantify transcr
 # Estimated run time: ~ 5 min
 # Hints:    - Check the trinity documentation and find a perl helper script that can be used to quantify with salmon
 #           - Submit this via sbatch with 4 CPUs, 20G of memory and a 2h hour run time 
-#           - Ensure that you activate the transcriptomics_bbda conda environment
+#           - Ensure that you activate the trinity_bbda conda environment
 #           - Do not forget the library type from Question 3 on day 1 
 #           - Use `--gene_trans_map  xxx/Trinity.fasta.gene_trans_map` to quantify on transcript as well as gene level
 #           - Add `--prep_reference` to build a target index
