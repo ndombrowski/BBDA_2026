@@ -148,7 +148,9 @@ Stats based on ALL transcript contigs:
 
 🔎 **Good to Know**
 
-Look at the first lines of the TrinityStats output: Trinity reports fewer 'genes' than transcripts. The transcript names show why. In `TRINITY_DN27172_c0_g1_i1`, the part before `_i1` (`TRINITY_DN27172_c0_g1`) is the gene ID and `_i1` is the isoform number. Trinity groups transcripts that look like they come from the same gene, so one 'gene' can have several isoforms (`_i1`, `_i2`, ...). The file `trinity.Trinity.fasta.gene_trans_map` lists this grouping. Keep in mind that a Trinity 'gene' is a computational grouping, not a confirmed gene.
+Look at the first lines of the TrinityStats output: Trinity reports fewer 'genes' than transcripts. The transcript names show why. In `TRINITY_DN27172_c0_g1_i1`, the part before `_i1` (`TRINITY_DN27172_c0_g1`) is the gene ID and `_i1` is the isoform number. Trinity groups transcripts that look like they come from the same gene, so one 'gene' can have several isoforms (`_i1`, `_i2`, ...). The file `trinity.Trinity.fasta.gene_trans_map` lists this grouping. 
+
+Keep in mind that a Trinity 'gene' is a computational grouping, not a confirmed gene. In the Chrysalis step (see lecture), Trinity clusters contigs that overlap and are connected by reads, and the isoforms of one Trinity 'gene' come from the same cluster. Because this grouping is based only on shared sequence, similar genes (for example from a gene family or genes that share a domain) can end up as one Trinity 'gene'. The reverse also happens: one real gene can be split into several Trinity 'genes' if parts of it had too few reads to connect them.
 
 ### Assess transcriptome completeness
 
