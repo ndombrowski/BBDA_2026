@@ -2283,7 +2283,7 @@ vertical-align: -.125em;
 <p><em>de novo</em> transcriptome assemblies are not error free. The assembler and the parameters you choose can affect the final results. That is why it is important to assess the quality of your assembly before moving to downstream analyses.</p>
 <p>Unlike reference-guided methods, evaluating a <em><em>de novo</em></em> assembly can be challenging since we lack a reference genome. However, there are different metrics that can be used and many can be computed with helper scripts included in Trinity. Some key metrics:</p>
 <ul>
-<li><strong>Fragmentation and contig length</strong>. If your assembly contains many short contigs (less than 200 bp) it may be very fragmented. Ideally, you want fewer, longer contigs.</li>
+<li><strong>Fragmentation and contig length</strong>. Many very short contigs can mean the assembly is fragmented, i.e. transcripts were broken into several pieces. However, unlike in a genome assembly, longer is not always better. In a genome assembly, the ideal contig covers a whole chromosome. In a transcriptome assembly, a contig should represent one transcript, so it cannot be longer than the mRNA it came from. Contigs that are much longer than expected may be two or more transcripts that were wrongly joined together (called chimeric transcripts). So instead of aiming for the longest possible contigs, check that contig lengths are in the range you would expect for transcripts of your organism.</li>
 <li><strong>Read support/Read mapping rate</strong>. This metric measures how well the original reads map back to the assembled transcripts. A good assembly should have &gt;80% of reads mapping back to the assembly. You will get this number later today from the Salmon log file, when you quantify expression.</li>
 <li><strong>Transcriptome completeness</strong>. This metric measures how complete your assembly is. You can assess this by checking how many conserved, single-copy genes (orthologues) are present in the assembly. This can be calculated with tools like BUSCO. A good assembly generally falls in the 80-90% completeness range, though the exact cutoff depends on how many marker genes were used.</li>
 </ul>
@@ -2377,7 +2377,7 @@ vertical-align: -.125em;
 <li>Comparison to the paper:
 <ol type="1">
 <li>Your assembly likely produced ~80,000 transcripts, which is less than the ~170,000 reported in the original study. The difference is expected because we worked with subsampled reads to reduce the computational load. This is a good example for how reducing sequencing depth might result in an under-representation of lowly expressed transcripts.</li>
-<li>The N50 value should be around 2,000 bp, which suggests the assembly quality is in line with the original study despite having fewer input reads.</li>
+<li>The N50 value should be around 2,000 bp while the original study reports an N50 2,279. This suggests that the assembly quality is in line with the original study despite having fewer input reads.</li>
 </ol></li>
 </ol>
 <p>🔎 <strong>Good to Know</strong></p>
@@ -2423,8 +2423,23 @@ Stats based on ALL transcript contigs:
 </div>
 </div>
 </div>
-<p>🔎 <strong>Good to Know</strong></p>
-<p>Look at the first lines of the TrinityStats output: Trinity reports fewer ‘genes’ than transcripts. The transcript names show why. In <code>TRINITY_DN27172_c0_g1_i1</code>, the part before <code>_i1</code> (<code>TRINITY_DN27172_c0_g1</code>) is the gene ID and <code>_i1</code> is the isoform number. Trinity groups transcripts that look like they come from the same gene, so one ‘gene’ can have several isoforms (<code>_i1</code>, <code>_i2</code>, …). The file <code>trinity.Trinity.fasta.gene_trans_map</code> lists this grouping. Keep in mind that a Trinity ‘gene’ is a computational grouping, not a confirmed gene.</p>
+<div class="callout callout-style-simple callout-tip callout-titled" title="Good to Know: Interpreting the Trinity output">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Good to Know: Interpreting the Trinity output
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>Look at the first lines of the TrinityStats output: Trinity reports fewer ‘genes’ than transcripts. The transcript names show why. In <code>TRINITY_DN27172_c0_g1_i1</code>, the part before <code>_i1</code> (<code>TRINITY_DN27172_c0_g1</code>) is the gene ID and <code>_i1</code> is the isoform number. Trinity groups transcripts that look like they come from the same gene, so one ‘gene’ can have several isoforms (<code>_i1</code>, <code>_i2</code>, …). The file <code>trinity.Trinity.fasta.gene_trans_map</code> lists this grouping.</p>
+<p>Keep in mind that a Trinity ‘gene’ is a computational grouping, not a confirmed gene. In the Chrysalis step (see lecture), Trinity clusters contigs that overlap and are connected by reads, and the isoforms of one Trinity ‘gene’ come from the same cluster. Because this grouping is based only on shared sequence, similar genes (for example from a gene family or genes that share a domain) can end up as one Trinity ‘gene’. The reverse also happens: one real gene can be split into several Trinity ‘genes’ if parts of it had too few reads to connect them.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="assess-transcriptome-completeness" class="level3">
 <h3 class="anchored" data-anchor-id="assess-transcriptome-completeness">Assess transcriptome completeness</h3>
@@ -2435,7 +2450,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-body-container">
 <p><strong>Do not yet run this section.</strong></p>
-<p>Since we do have a lot of things planned for today, only work on this section once you have finished everything else.</p>
+<p>Since we do have a lot of things planned for today, only work on this section once you have finished everything else or at least wait until you have finished with the annotation section, since the software in this section takes longer to run.</p>
 </div>
 </div>
 </div>
@@ -2456,7 +2471,7 @@ Stats based on ALL transcript contigs:
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-simple callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2465,7 +2480,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an output directory</span></span>
@@ -2509,7 +2524,7 @@ Stats based on ALL transcript contigs:
 </ul></li>
 </ol>
 <div class="callout callout-style-simple callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2518,7 +2533,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>1. Assembly completeness</strong></p>
 <p>Your BUSCO output will look something like this: <code>C:81.5%[S:19.0%,D:62.5%],F:3.6%,M:15.0%,n:3322</code>.</p>
@@ -2573,7 +2588,7 @@ Stats based on ALL transcript contigs:
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-simple callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2582,7 +2597,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare an output folder</span></span>
@@ -2605,17 +2620,17 @@ Stats based on ALL transcript contigs:
 </div>
 </div>
 </div>
-<div class="callout callout-style-simple callout-tip callout-titled" title="Good to Know">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout callout-style-simple callout-tip callout-titled" title="Good to Know: Working with sense transcripts">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Good to Know
+<span class="screen-reader-only">Tip</span>Good to Know: Working with sense transcripts
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>The <code>-S</code> option tells TransDecoder to only search the top strand of each transcript for ORFs, so 3 instead of 6 reading frames. This is only safe if all transcripts have the same orientation as the original mRNA (the sense strand). Because we ran Trinity with <code>--SS_lib_type RF</code>, Trinity reports our transcripts in sense orientation. For an unstranded assembly, transcripts can have either orientation, so you should not use <code>-S</code>, otherwise you would miss ORFs on the other strand.</p>
 </div>
@@ -2644,8 +2659,8 @@ Stats based on ALL transcript contigs:
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Remove lines starting with &quot;#&quot;</span></span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Extract columns of interest: transcript ID, target name, bitscore, and e-value</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: Keep only hits with e-value &lt;= 1E-3</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 5: Sort first by transcript ID, then by highest bitscore and lowest e-value</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 6: From the sorted list, keep only the top hit per transcript</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 5: sorts by bit score and then e-value, </span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 6: and after that keep the top row per transcript ID</span></span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="st">&#39;s/ \+ /\t/g&#39;</span> annotations/KEGG/sequence_results.txt <span class="kw">|</span> <span class="dt">\</span></span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sed</span> <span class="st">&#39;/^#/d&#39;</span><span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;s/ /\t/g&#39;</span><span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F</span><span class="st">&#39;\t&#39;</span> <span class="at">-v</span> OFS=<span class="st">&#39;\t&#39;</span> <span class="st">&#39;{print $1, $3, $6, $5}&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">awk</span> <span class="at">-F</span><span class="st">&#39;\t&#39;</span> <span class="at">-v</span> OFS=<span class="st">&#39;\t&#39;</span> <span class="st">&#39;($4 + 0) &lt;= 1E-3&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
@@ -2665,21 +2680,24 @@ Stats based on ALL transcript contigs:
 <span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#         - -o ... : specify output order </span></span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#                    (from file 1: cols 1,2,4,3; from file 2: cols 2 and 12)</span></span>
 <span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Sort the merged output and save as &#39;temp&#39;</span></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">join</span> <span class="at">-a1</span> <span class="at">-1</span> 2 <span class="at">-2</span> 1 <span class="at">-e</span><span class="st">&#39;-&#39;</span> <span class="at">-t</span> <span class="st">$&#39;</span><span class="dt">\t</span><span class="st">&#39;</span> <span class="at">-o1.1,1.2,1.4,1.3,2.2,2.12</span> <span class="op">&lt;(</span><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">sort</span> <span class="at">-k2</span> annotations/KEGG/sequence_results_best_hit.txt<span class="op">)</span> <span class="op">&lt;(</span><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">sort</span> <span class="at">-k1</span>  /zfs/omics/projects/education/BBDA_transcriptomics/denovo/databases/ko_list<span class="op">)</span> <span class="kw">|</span> <span class="va">LC_ALL</span><span class="op">=</span>C  <span class="fu">sort</span> <span class="op">&gt;</span>  temp</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a header line to the final output file</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Use &#39;echo&#39; to print the header with column names</span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Use &#39;cat - temp&#39; to concatenate the header (-) with the contents of &#39;temp&#39;</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co">#         - here, &#39;-&#39; tells &#39;cat&#39; to read from standard input (the echoed header)</span></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#         - &#39;temp&#39; is the file with our merged results</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Save everything into the final output file &#39;annotations/KEGG/annotations.txt&#39;</span></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">&quot;accession\tKO_hmm\tKO_e_value\tKO_bit_score\tKO_bit_score_cutoff\tKO_Definition&quot;</span> <span class="kw">|</span> <span class="fu">cat</span> <span class="at">-</span> temp <span class="op">&gt;</span> annotations/KEGG/sequence_results_best_hit_desc.txt</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleanup intermediate files</span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> temp </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: The KO mapping file comes with a bit score cutoff column (column KO_bit_score_cutoff)</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co"># We will not use this for filtering, since that cutoff tends to be too strict for non-model species, </span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co"># but we keep it in the table so you can judge how far below it a hit falls.</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">join</span> <span class="at">-a1</span> <span class="at">-1</span> 2 <span class="at">-2</span> 1 <span class="at">-e</span><span class="st">&#39;-&#39;</span> <span class="at">-t</span> <span class="st">$&#39;</span><span class="dt">\t</span><span class="st">&#39;</span> <span class="at">-o1.1,1.2,1.4,1.3,2.2,2.12</span> <span class="op">&lt;(</span><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">sort</span> <span class="at">-k2</span> annotations/KEGG/sequence_results_best_hit.txt<span class="op">)</span> <span class="op">&lt;(</span><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">sort</span> <span class="at">-k1</span>  /zfs/omics/projects/education/BBDA_transcriptomics/denovo/databases/ko_list<span class="op">)</span> <span class="kw">|</span> <span class="va">LC_ALL</span><span class="op">=</span>C  <span class="fu">sort</span> <span class="op">&gt;</span>  temp</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a header line to the final output file</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Use &#39;echo&#39; to print the header with column names</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Use &#39;cat - temp&#39; to concatenate the header (-) with the contents of &#39;temp&#39;</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co">#         - here, &#39;-&#39; tells &#39;cat&#39; to read from standard input (the echoed header)</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">#         - &#39;temp&#39; is the file with our merged results</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Save everything into the final output file &#39;annotations/KEGG/sequence_results_best_hit_desc.txt&#39;</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">&quot;accession\tKO_hmm\tKO_e_value\tKO_bit_score\tKO_bit_score_cutoff\tKO_Definition&quot;</span> <span class="kw">|</span> <span class="fu">cat</span> <span class="at">-</span> temp <span class="op">&gt;</span> annotations/KEGG/sequence_results_best_hit_desc.txt</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleanup intermediate files</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> temp </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-simple callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2688,7 +2706,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write a sbatch script to run a hmmsearch to compare proteins against KEGG profiles</span></span>
@@ -2754,7 +2772,7 @@ Stats based on ALL transcript contigs:
 </ol></li>
 </ol>
 <div class="callout callout-style-simple callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2763,7 +2781,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Transdecoder output:
@@ -2805,59 +2823,60 @@ Stats based on ALL transcript contigs:
 <section id="identifying-differentially-expressed-genes" class="level2">
 <h2 class="anchored" data-anchor-id="identifying-differentially-expressed-genes">Identifying differentially expressed genes</h2>
 <p>There are several methods for estimating transcript abundance in a genome-free manner, and these include alignment-based methods (aligning reads to the transcript assembly) and alignment-free methods (which assign reads to transcripts by matching k-mers against an index of the transcripts, instead of aligning every base).</p>
-<p>In this section, we will make use of a Trinity helper script to quantify transcript and gene-level abundances of each of our 6 samples using the alignment-free method salmon <span class="citation" data-cites="Patro2017">(<a href="#ref-Patro2017" role="doc-biblioref">Patro et al. 2017</a>)</span>.</p>
+<p>In this section, we will make use of a <a href="https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-Transcript-Quantification" target="_blank" rel="noopener noreferrer">Trinity helper script</a> to quantify transcript and gene-level abundances of each of our 6 samples using the alignment-free method salmon <span class="citation" data-cites="Patro2017">(<a href="#ref-Patro2017" role="doc-biblioref">Patro et al. 2017</a>)</span>.</p>
 <section id="quantification-with-salmon" class="level3">
 <h3 class="anchored" data-anchor-id="quantification-with-salmon">Quantification with salmon</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write an sbatch script to run salmon for transcript quantification</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated run time: ~ 5 min</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Hints:    - Check the trinity documentation and find a perl helper script that can be used to quantify with salmon</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Submit this via sbatch with 4 CPUs, 20G of memory and a 2h hour run time </span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Ensure that you activate the transcriptomics_bbda conda environment</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Do not forget the library type from Question 3 on day 1 </span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Use `--gene_trans_map  xxx/Trinity.fasta.gene_trans_map` to quantify on transcript as well as gene level</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Add `--prep_reference` to build a target index</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleanup:</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># unfortunately, the --output_dir does not work very well and </span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Salmon will generate one output folder per sample in the working dir, </span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># therefore, use the mv command to generate an organized folder structure</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"># The salmon log file can be used to extract the mapping rate, </span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co"># another useful statistic to assess the assembly quality.</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># We provide a small helper script for this.</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Use it and check what the mapping rate is</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /zfs/omics/projects/education/BBDA_transcriptomics/denovo/scripts/parse_salmon.py scripts </span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/parse_salmon.py <span class="at">-i</span> logs/salmon_<span class="pp">*</span>.err</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co"># With this you have all files for your DEG analysis with DESeq in R </span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co"># You can do the analysis on Crunchomics or on your own computer if you prefer to use RStudio </span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co"># If you want to do the later you need to transfer the salmon folders, </span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co"># assembly, gene to transcript mapping and parsed annotations</span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co"># for the downstream analyses to your own computer</span></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> ... </span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You can use rsync to download and maintain a folder structure </span></span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co"># but have fine-grained control over what you want to access </span></span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1:  -a : archive mode (preserves permissions, timestamps, symlinks)</span></span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co">#         -v : verbose (prints progress)</span></span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Keep directory structure but only include specific files</span></span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">#         --prune-empty-dirs : remove any empty directories from the copy</span></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="co">#         --include=&#39;*/&#39;     : include all directories so structure is preserved</span></span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">#         --include=&#39;quant.sf&#39; : include transcript-level quantification files</span></span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#         --include=&#39;quant.sf.genes&#39; : include gene-level quantification files</span></span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">#         --exclude=&#39;*&#39;      : exclude everything else</span></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="fu">rsync</span> <span class="at">-av</span> <span class="at">--prune-empty-dirs</span> <span class="dt">\</span></span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include</span><span class="op">=</span><span class="st">&#39;*/&#39;</span> <span class="dt">\</span></span>
-<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include</span><span class="op">=</span><span class="st">&#39;quant.sf&#39;</span> <span class="dt">\</span></span>
-<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include</span><span class="op">=</span><span class="st">&#39;quant.sf.genes&#39;</span> <span class="dt">\</span></span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">--exclude</span><span class="op">=</span><span class="st">&#39;*&#39;</span> <span class="dt">\</span></span>
-<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    crunchomics:/path/salmon_abund/ results/trinity/salmon_abund/</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Hints:    - Check the trinity documentation and find a perl helper script that can be used to </span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#              quantify with salmon</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Submit this via sbatch with 4 CPUs, 20G of memory and a 2h hour run time </span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Ensure that you activate the trinity_bbda conda environment</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Do not forget the library type from Question 3 on day 1 </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Use `--gene_trans_map  xxx/Trinity.fasta.gene_trans_map` to quantify on transcript as well as gene level</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#           - Add `--prep_reference` to build a target index</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleanup:</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># unfortunately, the --output_dir does not work very well and </span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Salmon will generate one output folder per sample in the working dir, </span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># therefore, use the mv command to generate an organized folder structure</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co"># The salmon log file can be used to extract the mapping rate, </span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># another useful statistic to assess the assembly quality.</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># We provide a small helper script for this.</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Use it and check what the mapping rate is</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /zfs/omics/projects/education/BBDA_transcriptomics/denovo/scripts/parse_salmon.py scripts </span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/parse_salmon.py <span class="at">-i</span> logs/salmon_<span class="pp">*</span>.err</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co"># With this you have all files for your DEG analysis with DESeq in R </span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co"># You can do the analysis on Crunchomics or on your own computer if you prefer to use RStudio </span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co"># If you want to do the later you need to transfer the salmon folders, </span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co"># assembly, gene to transcript mapping and parsed annotations</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co"># for the downstream analyses to your own computer</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> ... </span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You can use rsync to download and maintain a folder structure </span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co"># but have fine-grained control over what you want to access </span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1:  -a : archive mode (preserves permissions, timestamps, symlinks)</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">#         -v : verbose (prints progress)</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Keep directory structure but only include specific files</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="co">#         --prune-empty-dirs : remove any empty directories from the copy</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">#         --include=&#39;*/&#39;     : include all directories so structure is preserved</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#         --include=&#39;quant.sf&#39; : include transcript-level quantification files</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">#         --include=&#39;quant.sf.genes&#39; : include gene-level quantification files</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co">#         --exclude=&#39;*&#39;      : exclude everything else</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="fu">rsync</span> <span class="at">-av</span> <span class="at">--prune-empty-dirs</span> <span class="dt">\</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include</span><span class="op">=</span><span class="st">&#39;*/&#39;</span> <span class="dt">\</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include</span><span class="op">=</span><span class="st">&#39;quant.sf&#39;</span> <span class="dt">\</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include</span><span class="op">=</span><span class="st">&#39;quant.sf.genes&#39;</span> <span class="dt">\</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">--exclude</span><span class="op">=</span><span class="st">&#39;*&#39;</span> <span class="dt">\</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    crunchomics:/path/salmon_abund/ results/trinity/salmon_abund/</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-simple callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2866,7 +2885,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write an sbatch script to run salmon for transcript quantification</span></span>
@@ -2928,7 +2947,9 @@ Stats based on ALL transcript contigs:
 <h3 class="anchored" data-anchor-id="deg-analysis-with-deseq2">DEG analysis with DESeq2</h3>
 <p>After transcriptome assembly and annotation, differential gene expression (DGE) analysis helps us identify genes with significantly different expression levels between experimental conditions. Since you have worked with DESeq2 before, you can use your notes from that tutorial to run the next steps. Briefly, you want to do the following:</p>
 <ol type="1">
-<li>Load the required libraries (tidyverse, tximport and DESeq2). Note, none of these are installed but you can install them yourself on your personal PC or the HPC with <code>install.packages(&quot;name&quot;)</code></li>
+<li><ol type="1">
+<li>Load the required libraries (tidyverse, tximport and DESeq2). Note, none of these are installed but you can install them yourself on your personal PC or the HPC. tidyverse can be installed with <code>install.packages(&quot;tidyverse&quot;)</code>. tximport and DESeq2 are not available through <code>install.packages()</code>, since they come from Bioconductor, a separate collection of R packages for biological data. To install them, first install the BiocManager package with <code>install.packages(&quot;BiocManager&quot;)</code>, then run <code>BiocManager::install(c(&quot;tximport&quot;, &quot;DESeq2&quot;))</code>.</li>
+</ol></li>
 <li>Read in the salmon data with <a href="https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#transcript-abundance-files-and-tximport-tximeta" target="_blank" rel="noopener noreferrer">tximport</a>
 <ol type="1">
 <li>You can use the salmon folder names to make a minimal samples mapping file:</li>
@@ -2964,7 +2985,7 @@ Stats based on ALL transcript contigs:
 <p>🔎 <strong>Good to Know</strong></p>
 <p>We quantify at transcript and gene level, but use the gene level for the DEG analysis. Isoforms of a gene share a lot of sequence, so many reads could come from more than one isoform. Salmon splits such reads between the isoforms (as in the lecture), which makes isoform-level estimates uncertain. Adding up the isoforms of a gene reduces this problem, because a read from any isoform counts towards the gene.</p>
 <div class="callout callout-style-simple callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -2973,7 +2994,7 @@ Stats based on ALL transcript contigs:
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <section id="general-setup" class="level3">
 <h3 class="anchored" data-anchor-id="general-setup">General setup</h3>
@@ -3239,7 +3260,7 @@ low counts [2]     : 7170, 35%
 </ol></li>
 </ol>
 <div class="callout callout-style-simple callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -3248,7 +3269,7 @@ low counts [2]     : 7170, 35%
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>You should have found roughly 70-90 DEGs, the large majority up-regulated and very few (if any) down-regulated. Don’t worry if your exact numbers differ a bit from these, small differences in the assembly or filtering choices can shift the count. We find far fewer DEGs than described in the paper (153 upregulated and 17 downregulated), likely because of the massive downsampling of reads.</li>
@@ -3259,7 +3280,18 @@ low counts [2]     : 7170, 35%
 </div>
 </div>
 </div>
-<p>🔎 <strong>Good to Know</strong>:</p>
+<div class="callout callout-style-simple callout-tip callout-titled" title="Good to Know: Software versions matter">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Good to Know: Software versions matter
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <p><strong>Versions matter</strong>: When running this tutorial I noticed that knowing the version of your software is crucial if you want to repeat the code as this can impact your results. This is what happened to me, when running the code in two different R environments:</p>
 <table class="caption-top table">
 <colgroup>
@@ -3299,6 +3331,9 @@ low counts [2]     : 7170, 35%
 <li>always record the package versions in your method section</li>
 <li>use <code>sessionInfo()</code> in your R scripts to automatically print all attached packages and package version</li>
 </ul>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="references" class="level2">

@@ -71,7 +71,7 @@ mamba create \
     busco=6.1.0 \
     transdecoder=6.0.0
 
-# Work around a bioconda packaging bug in transdecoder=6.0.0: its build script
+# Work around for a bioconda packaging bug in transdecoder=6.0.0: its build script
 # was not updated for a new folder layout, so the new `TransDecoder` wrapper
 # never gets linked into bin/. The script itself is still installed under opt/,
 # so link it in manually:
@@ -212,6 +212,19 @@ A small amount of folder structure goes a long way. Keeping small text files (li
 
 You should already be familiar with FastQC [@fastqc2015], a tool that lets you assess the quality of sequence data. As you have done in a previous tutorial, you will use FastQC to perform a quality assessment of the raw reads. Additionally, you will use [SeqKit stats](https://scienceparkstudygroup.github.io/ibed-bioinformatics-page/source/core_tools/seqkit.html) to generate a summary table to count the total number of reads you're working with [@Shen2016].
 
+::: {.callout-tip}
+## Tip
+
+Whenever you use a tool for the first time, take a few minutes to look at its options before you run it. There are two places to look:
+
+- **The help page in the terminal.** Most tools list their options when you add `--help` (sometimes `-h`) after the tool name, for example `fastqc --help`. For tools with subcommands, like SeqKit, ask for help on the subcommand itself: `seqkit stats --help`. If a tool is installed in a conda environment, activate that environment first, otherwise you will get a "command not found" error.
+- **The online manual.** This usually explains the options in more detail and often includes examples. Options can change between versions, so check which version you are using (for example with `--version`) and make sure the manual matches it.
+
+If the two disagree, trust the help page, since it comes from the version that is actually installed.
+
+Try this now: use `seqkit stats --help` to find the options you need for the seqkit step below.
+:::
+
 ```{bash}
 # Set an environment variable to the folder with the raw data
 # Note: It is recommended to store all custom paths as variables at the top of your code,
@@ -306,7 +319,7 @@ Side-notes:
 :::
 :::
 
-::: {.callout-tip title="Good to Know: Removing rRNA and contaminant sequences" collapse="false" appearance="simple"}
+::: {.callout-tip title="Good to Know: Removing rRNA and contaminant sequences" collapse="true" appearance="simple"}
 You might wonder why we don't remove ribosomal RNA (rRNA) or other contaminating sequences before assembly, even though the introduction on this page mentions it as part of a typical de novo workflow.
 
 For this dataset, we checked the rRNA content beforehand with a dedicated rRNA-detection tool, and it came back low (roughly 1-4.5% of reads per sample). Because of this, and to keep the tutorial close to the trimming strategy used in the original paper, we skip an explicit rRNA-removal step here.
@@ -327,7 +340,7 @@ The reason why we will use fastp instead of Trimmomatic is because it runs faste
 -   `--length_required 50`
 -   `--cut_right`
 
-Since fastp will run for a bit longer and we want to run it on multiple samples, we will now write our first SLURM job script. For this, we could use a [for-loop](https://scienceparkstudygroup.github.io/ibed-bioinformatics-page/source/core_tools/bash-for-loops.html), which would run all 6 fastp steps one after the other. You can also use [SLURM arrays](https://blog.ronin.cloud/slurm-job-arrays/) to parallelize these steps and, for example, run 2 fastp steps at the same time. Because you’ve likely already worked with for-loops, the code template below shows an example that makes use of a SLURM array instead.
+Since fastp will run for a bit longer and we want to run it on multiple samples, we will now write our first SLURM job script. For this, we could use a [for-loop](https://scienceparkstudygroup.github.io/ibed-bioinformatics-page/source/core_tools/bash-for-loops.html), which would run all 6 fastp steps one after the other. You can also use [SLURM arrays](https://ndombrowski.github.io/BBDA_2026/intro_arrays_no_answer.html#/title-slide) to parallelize these steps and, for example, run 2 fastp steps at the same time. Because you’ve likely already worked with for-loops, the code template below shows an example that makes use of a SLURM array instead.
 
 After the quality cleaning is done, we will repeat the `fastqc` and `seqkit stats` analyses on the quality-cleaned reads in order to see if the quality has improved.
 
@@ -523,7 +536,10 @@ sbatch scripts/trinity.sh
 ```
 :::
 
-::: {.callout-tip title="Good to Know" collapse="true" appearance="simple"}
+
+
+::: {.callout-tip title="Good to Know: Useful trinity settings" collapse="true" appearance="simple"}
+
 You might notice that the Trinity command above leaves out a few settings the original paper used: `--SS_lib_type RF --normalize_reads --inchworm_cpu 24 --bflyHeapSpaceInit 24G --bflyHeapSpaceMax 240G --CPU 24 --jaccard_clip --min_kmer_cov 2`. Two of these are worth knowing about:
 
 -   **`--normalize_reads` is no longer something you need to set.** Trinity has performed in silico read normalization by default since 2016, well before the version used in this course (v2.15.2). The flag is still accepted for backwards compatibility, but it does nothing; normalization only turns off if you explicitly add `--no_normalize_reads`. So even though our command doesn't mention it, normalization is still happening.
@@ -532,9 +548,12 @@ You might notice that the Trinity command above leaves out a few settings the or
 The lower `--inchworm_cpu`/`--CPU` values compared to the paper are simply scaled down to match our smaller, subsampled dataset and the compute resources allocated for this course.
 :::
 
-🔎 **Good to Know**
+
+::: {.callout-tip title="Good to Know: Trinity alternatives" collapse="true" appearance="simple"}
 
 Trinity is not the only transcriptome assembly tool out there. While it is out of the scope of this tutorial to compare different assembly tools, you might also read about SOAPdenovo-Trans [@Xie2014], IDBA-Tran [@Peng2013], rnaSPADES [@Bushmanova2019], and other assembly tools. Choosing the right assembler and assembly settings can be a difficult task. How an assembler performs will differ a lot for different datasets, and there is no good way to predict what the best assembler for your data is [@Hölzer2019]. Therefore, it is often recommended to compare different assemblers with multiple kmer lengths.
+
+:::
 
 
 ## References

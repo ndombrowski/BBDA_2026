@@ -27,8 +27,8 @@
      showgrid="false"
      showguides="true"
      inkscape:zoom="0.5"
-     inkscape:cx="555"
-     inkscape:cy="748"
+     inkscape:cx="779"
+     inkscape:cy="590"
      inkscape:window-width="1440"
      inkscape:window-height="829"
      inkscape:window-x="-8"
@@ -46,6 +46,12 @@
        second-strand cDNA #A6CAEC (text #215F9A), connectors #7F7F7F -->
   <defs
      id="defs5">
+    <rect
+       x="1350"
+       y="966"
+       width="376"
+       height="202"
+       id="rect476" />
     <marker
        id="arrow"
        viewBox="0 0 10 10"
@@ -66,13 +72,11 @@
      fill="#ffffff"
      id="rect7" />
   <!-- ===== Shared start: mRNA and first-strand cDNA ===== -->
-  <line
-     x1="560"
-     y1="60"
-     x2="940"
-     y2="60"
-     stroke="#7030A0"
-     stroke-width="10"
+  <polygon
+     points="560,50 936,50 948,60 936,70 560,70"
+     fill="#7030A0"
+     stroke="#000000"
+     stroke-width="1.5"
      id="line9" />
   <text
      x="548"
@@ -515,27 +519,40 @@
   <!-- ===== Take-home per column ===== -->
   <text
      x="375"
-     y="780"
-     font-size="20"
+     y="784"
+     font-size="20px"
      text-anchor="middle"
-     id="text133">Read 1 can match either strand:</text>
-  <text
-     x="375"
-     y="808"
-     font-size="20"
-     font-weight="bold"
-     text-anchor="middle"
-     id="text135">first strand in ~50% of pairs, second in ~50%</text>
-  <text
-     x="1125"
-     y="780"
-     font-size="20"
-     text-anchor="middle"
-     id="text137">Read 1 always matches the first strand:</text>
+     id="text133"><tspan
+       sodipodi:role="line"
+       id="tspan492"
+       x="375"
+       y="784">Read 1 has the sequence of the first strand in ~50% of pairs,</tspan><tspan
+       sodipodi:role="line"
+       id="tspan494"
+       x="375"
+       y="809">and of the second strand in the other ~50%</tspan></text>
   <text
      x="1125"
-     y="808"
-     font-size="20"
+     y="784"
+     font-size="20px"
+     text-anchor="middle"
+     id="text137"><tspan
+       sodipodi:role="line"
+       id="tspan468"
+       x="1125"
+       y="784">Read 1 always has the same sequence as the first strand</tspan><tspan
+       sodipodi:role="line"
+       x="1125"
+       y="809"
+       id="tspan472">(antisense to the mRNA):</tspan><tspan
+       sodipodi:role="line"
+       id="tspan470"
+       x="1125"
+       y="834" /></text>
+  <text
+     x="1125"
+     y="836"
+     font-size="20px"
      font-weight="bold"
      text-anchor="middle"
      id="text139">reverse stranded (RF)</text>
@@ -566,4 +583,8 @@
      y="867"
      id="text151"
      style="font-size:17px">second-strand cDNA (sense)</text>
+  <text
+     xml:space="preserve"
+     id="text474"
+     style="fill:#474747;-inkscape-font-specification:'Arial, Helvetica, sans-serif';font-family:Arial, Helvetica, sans-serif;font-size:20px;stroke-miterlimit:3.9;stroke-linejoin:round;stroke-linecap:round;stroke-width:2;stroke:#000000;text-align:center;white-space:pre;shape-inside:url(#rect476)" />
 </svg>
